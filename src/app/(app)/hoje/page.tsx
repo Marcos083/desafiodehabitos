@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { buttonVariants } from "@/components/ui/button";
 import { LogoutForm } from "@/features/auth/components/logout-form";
 import {
   getCurrentPartnership,
@@ -67,8 +69,16 @@ export default async function HojePage() {
         )}
       </section>
 
-      <section className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        Em breve: lista de hábitos para check-in diário.
+      <section className="flex flex-col gap-3 rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+        <p>Em breve: check-in diário dos seus hábitos.</p>
+        <div className="flex justify-center">
+          <Link
+            href="/habitos"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Gerenciar hábitos
+          </Link>
+        </div>
       </section>
     </main>
   );
