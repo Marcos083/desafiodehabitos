@@ -3,10 +3,14 @@ import { redirect } from "next/navigation";
 
 import { buttonVariants } from "@/components/ui/button";
 import { LogoutForm } from "@/features/auth/components/logout-form";
+import { getTodayCheckIns } from "@/features/check-ins/queries";
+import { TodayHabits } from "@/features/check-ins/components/today-habits";
+import { getHabits } from "@/features/habits/queries";
 import {
   getCurrentPartnership,
   getPartnershipMembers,
 } from "@/features/partnerships/queries";
+import { weekdayInBR } from "@/lib/date";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function HojePage() {
@@ -34,6 +38,22 @@ export default async function HojePage() {
   const partnerName = partner?.display_name ?? "aguardando parceiro";
   const isSolo = members.length < 2;
 
+  const today = weekdayInBR();
+  const allHabits = await getHabits(partnership.id);
+  const checkIns = await getTodayCheckIns(partnership.id);
+
+  const activeToday = allHabits.filter((h) => h.active_days.includes(today));
+  const myHabitsToday = activeToday.filter((h) => h.user_id === user!.id);
+  const partnerHabitsToday = activeToday.filter(
+    (h) => h.user_id !== user!.id,
+  );
+
+  const partnerCheckIns = partner
+    ? checkIns.filter((c) => c.user_id === partner.user_id)
+    : [];
+  const partnerDone = partnerCheckIns.length;
+  const partnerTotal = partnerHabitsToday.length;
+
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col gap-8 px-4 py-10">
       <header className="flex items-center justify-between">
@@ -46,15 +66,12 @@ export default async function HojePage() {
         <LogoutForm />
       </header>
 
-      <section className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-        <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Parceria
-        </p>
-        <p className="mt-1 text-lg font-medium">{partnership.name}</p>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-          Parceiro: <span className="font-medium">{partnerName}</span>
-        </p>
-        {isSolo && (
+      {isSolo && (
+        <section className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+          <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Parceria
+          </p>
+          <p className="mt-1 text-lg font-medium">{partnership.name}</p>
           <div className="mt-4 rounded-md bg-zinc-50 p-3 dark:bg-zinc-900">
             <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Código de convite
@@ -66,20 +83,48 @@ export default async function HojePage() {
               Compartilhe esse código com seu parceiro para ele entrar.
             </p>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
-      <section className="flex flex-col gap-3 rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        <p>Em breve: check-in diário dos seus hábitos.</p>
-        <div className="flex justify-center">
+      <section className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Seus hábitos hoje</h2>
           <Link
             href="/habitos"
-            className={buttonVariants({ variant: "outline" })}
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
-            Gerenciar hábitos
+            Gerenciar
           </Link>
         </div>
+        <TodayHabits
+          habits={myHabitsToday}
+          checkIns={checkIns}
+          currentUserId={user!.id}
+        />
       </section>
+
+      {!isSolo && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold">{partnerName}</h2>
+          <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Progresso hoje
+            </p>
+            <p className="mt-1 text-3xl font-semibold tabular-nums">
+              {partnerDone}
+              <span className="text-zinc-400 dark:text-zinc-600">
+                {" "}
+                / {partnerTotal}
+              </span>
+            </p>
+            {partnerTotal === 0 && (
+              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                Seu parceiro não tem hábitos programados pra hoje.
+              </p>
+            )}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
