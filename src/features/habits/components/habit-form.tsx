@@ -38,9 +38,7 @@ function SubmitButton({ mode }: { mode: "create" | "edit" }) {
 
 export function HabitForm({ habit }: { habit?: HabitDefaults }) {
   const mode = habit ? "edit" : "create";
-  const action = habit
-    ? updateHabit.bind(null, habit.id)
-    : createHabit;
+  const action = habit ? updateHabit : createHabit;
 
   const [state, formAction] = useActionState(action, null);
 
@@ -49,6 +47,7 @@ export function HabitForm({ habit }: { habit?: HabitDefaults }) {
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
+      {habit && <input type="hidden" name="id" value={habit.id} />}
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">Nome</Label>
         <Input

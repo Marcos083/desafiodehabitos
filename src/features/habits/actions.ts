@@ -86,10 +86,14 @@ export async function createHabit(
 }
 
 export async function updateHabit(
-  habitId: string,
   _prev: FormState | null,
   formData: FormData,
 ): Promise<FormState> {
+  const habitId = formData.get("id");
+  if (typeof habitId !== "string" || habitId.length === 0) {
+    return { status: "error", message: "Hábito inválido." };
+  }
+
   const parsed = parseFormData(formData);
 
   if (!parsed.success) {
