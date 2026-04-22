@@ -89,12 +89,20 @@ export default async function HojePage() {
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Seus hábitos hoje</h2>
-          <Link
-            href="/habitos"
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
-            Gerenciar
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/placar"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Placar
+            </Link>
+            <Link
+              href="/habitos"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Gerenciar
+            </Link>
+          </div>
         </div>
         <TodayHabits
           habits={myHabitsToday}
