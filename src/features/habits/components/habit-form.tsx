@@ -6,7 +6,7 @@ import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createHabit } from "@/features/habits/actions";
+import { createHabit, updateHabit } from "@/features/habits/actions";
 
 const WEEKDAYS = [
   { value: 0, label: "Dom" },
@@ -18,17 +18,34 @@ const WEEKDAYS = [
   { value: 6, label: "Sáb" },
 ];
 
-function SubmitButton() {
+type HabitDefaults = {
+  id: string;
+  name: string;
+  description: string | null;
+  active_days: number[];
+};
+
+function SubmitButton({ mode }: { mode: "create" | "edit" }) {
   const { pending } = useFormStatus();
+  const label = mode === "create" ? "Criar hábito" : "Salvar alterações";
+  const pendingLabel = mode === "create" ? "Criando..." : "Salvando...";
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "Salvando..." : "Criar hábito"}
+      {pending ? pendingLabel : label}
     </Button>
   );
 }
 
-export function HabitForm() {
-  const [state, formAction] = useActionState(createHabit, null);
+export function HabitForm({ habit }: { habit?: HabitDefaults }) {
+  const mode = habit ? "edit" : "create";
+  const action = habit
+    ? updateHabit.bind(null, habit.id)
+    : createHabit;
+
+  const [state, formAction] = useActionState(action, null);
+
+  const isDayChecked = (day: number) =>
+    habit ? habit.active_days.includes(day) : true;
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -41,6 +58,7 @@ export function HabitForm() {
           required
           minLength={2}
           maxLength={80}
+          defaultValue={habit?.name}
           placeholder="Ex: Beber 2L de água"
         />
       </div>
@@ -52,6 +70,7 @@ export function HabitForm() {
           name="description"
           type="text"
           maxLength={280}
+          defaultValue={habit?.description ?? ""}
           placeholder="Detalhes que você queira lembrar"
         />
       </div>
@@ -68,7 +87,7 @@ export function HabitForm() {
                 type="checkbox"
                 name="active_days"
                 value={day.value}
-                defaultChecked
+                defaultChecked={isDayChecked(day.value)}
                 className="sr-only"
               />
               <span className="font-medium">{day.label}</span>
@@ -83,7 +102,7 @@ export function HabitForm() {
         </p>
       )}
 
-      <SubmitButton />
+      <SubmitButton mode={mode} />
     </form>
   );
 }

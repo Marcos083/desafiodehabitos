@@ -15,3 +15,16 @@ export async function getHabits(partnershipId: string) {
   if (error) throw error;
   return data;
 }
+
+export async function getHabit(habitId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("habits")
+    .select("id, name, description, active_days, partnership_id, user_id")
+    .eq("id", habitId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}

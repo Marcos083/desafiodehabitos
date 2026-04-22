@@ -5,6 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { HabitsList } from "@/features/habits/components/habits-list";
 import { getHabits } from "@/features/habits/queries";
 import { getCurrentPartnership } from "@/features/partnerships/queries";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function HabitosPage() {
   const partnership = await getCurrentPartnership();
@@ -12,6 +13,11 @@ export default async function HabitosPage() {
   if (!partnership) {
     redirect("/onboarding");
   }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const habits = await getHabits(partnership.id);
 
@@ -34,7 +40,7 @@ export default async function HabitosPage() {
         </Link>
       </header>
 
-      <HabitsList habits={habits} />
+      <HabitsList habits={habits} currentUserId={user!.id} />
     </main>
   );
 }

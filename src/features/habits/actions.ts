@@ -12,7 +12,7 @@ type FormState =
   | { status: "error"; message: string }
   | { status: "success" };
 
-const createSchema = z.object({
+const habitSchema = z.object({
   name: z
     .string()
     .trim()
@@ -29,20 +29,24 @@ const createSchema = z.object({
     .min(1, "Escolha pelo menos um dia."),
 });
 
-export async function createHabit(
-  _prev: FormState | null,
-  formData: FormData,
-): Promise<FormState> {
+function parseFormData(formData: FormData) {
   const activeDays = formData
     .getAll("active_days")
     .map((v) => Number(v))
     .filter((n) => Number.isInteger(n));
 
-  const parsed = createSchema.safeParse({
+  return habitSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description") ?? undefined,
     active_days: activeDays,
   });
+}
+
+export async function createHabit(
+  _prev: FormState | null,
+  formData: FormData,
+): Promise<FormState> {
+  const parsed = parseFormData(formData);
 
   if (!parsed.success) {
     return { status: "error", message: parsed.error.issues[0]!.message };
@@ -79,4 +83,50 @@ export async function createHabit(
 
   revalidatePath("/habitos");
   redirect("/habitos");
+}
+
+export async function updateHabit(
+  habitId: string,
+  _prev: FormState | null,
+  formData: FormData,
+): Promise<FormState> {
+  const parsed = parseFormData(formData);
+
+  if (!parsed.success) {
+    return { status: "error", message: parsed.error.issues[0]!.message };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("habits")
+    .update({
+      name: parsed.data.name,
+      description: parsed.data.description ?? null,
+      active_days: parsed.data.active_days,
+    })
+    .eq("id", habitId);
+
+  if (error) {
+    return {
+      status: "error",
+      message: "Não foi possível atualizar o hábito.",
+    };
+  }
+
+  revalidatePath("/habitos");
+  redirect("/habitos");
+}
+
+export async function archiveHabit(habitId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("habits")
+    .update({ archived_at: new Date().toISOString(), is_active: false })
+    .eq("id", habitId);
+
+  if (error) {
+    throw new Error("Não foi possível arquivar o hábito.");
+  }
+
+  revalidatePath("/habitos");
 }
