@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { CheckInsRealtime } from "@/features/check-ins/components/check-ins-realtime";
 import { getHabits } from "@/features/habits/queries";
 import {
   getCurrentPartnership,
@@ -57,6 +58,7 @@ export default async function PlacarPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col gap-6 px-4 py-10">
+      <CheckInsRealtime partnershipId={partnership.id} />
       <div>
         <Link
           href="/hoje"
