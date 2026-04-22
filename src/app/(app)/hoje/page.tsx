@@ -56,32 +56,32 @@ export default async function HojePage() {
   const partnerTotal = partnerHabitsToday.length;
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col gap-8 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
       <CheckInsRealtime partnershipId={partnership.id} />
       <header className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Olá, {displayName}
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight">Hoje</h1>
+          <p className="text-sm text-muted-foreground">Olá, {displayName}</p>
+          <h1 className="text-3xl font-medium tracking-tight text-ink">Hoje</h1>
         </div>
         <LogoutForm />
       </header>
 
       {isSolo && (
-        <section className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-          <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+        <section className="rounded-[20px] border border-border bg-surface p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Parceria
           </p>
-          <p className="mt-1 text-lg font-medium">{partnership.name}</p>
-          <div className="mt-4 rounded-md bg-zinc-50 p-3 dark:bg-zinc-900">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-lg font-medium text-ink">
+            {partnership.name}
+          </p>
+          <div className="mt-4 rounded-[14px] bg-signal-faint p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-ink-2/70">
               Código de convite
             </p>
-            <p className="mt-1 font-mono text-2xl tracking-[0.3em]">
+            <p className="mt-1 font-mono text-2xl tracking-[0.3em] text-ink">
               {partnership.invite_code}
             </p>
-            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-2 text-xs text-ink-2/70">
               Compartilhe esse código com seu parceiro para ele entrar.
             </p>
           </div>
@@ -90,7 +90,9 @@ export default async function HojePage() {
 
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Seus hábitos hoje</h2>
+          <h2 className="text-xl font-medium tracking-tight text-ink">
+            Seus hábitos hoje
+          </h2>
           <div className="flex gap-2">
             <Link
               href="/placar"
@@ -115,26 +117,26 @@ export default async function HojePage() {
 
       {!isSolo && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-xl font-semibold">{partnerName}</h2>
-          <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Progresso hoje
-            </p>
-            <p className="mt-1 text-3xl font-semibold tabular-nums">
+          <h2 className="text-xl font-medium tracking-tight text-ink">
+            {partnerName}
+          </h2>
+          <div className="rounded-[20px] border border-border bg-surface p-5">
+            <p className="text-sm text-muted-foreground">Progresso hoje</p>
+            <p className="mt-1 text-3xl font-medium tabular-nums text-ink">
               {partnerDone}
-              <span className="text-zinc-400 dark:text-zinc-600">
+              <span className="text-muted-foreground/60">
                 {" "}
                 / {partnerTotal}
               </span>
             </p>
             {partnerTotal === 0 && (
-              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="mt-2 text-xs text-muted-foreground">
                 Seu parceiro não tem hábitos programados pra hoje.
               </p>
             )}
           </div>
         </section>
       )}
-    </main>
+    </div>
   );
 }
