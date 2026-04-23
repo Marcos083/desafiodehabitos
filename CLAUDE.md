@@ -71,11 +71,22 @@ npm run format        # prettier --write
 npm run build         # build de produção
 ```
 
-Supabase CLI (quando adicionar):
+Supabase CLI:
 ```
+# Regenerar types (dev)
 npx supabase gen types typescript --project-id vqxnjtgnaafjhdpquiiy > src/types/database.types.ts
-npx supabase db push
+# Regenerar types (prod)
+npx supabase gen types typescript --project-id wcttksbuybnitbojiodr > src/types/database.types.ts
 ```
+
+## Projetos Supabase
+- **Dev** — ref: `vqxnjtgnaafjhdpquiiy` | URL: `https://vqxnjtgnaafjhdpquiiy.supabase.co`
+- **Prod** — ref: `wcttksbuybnitbojiodr` | URL: `https://wcttksbuybnitbojiodr.supabase.co`
+
+## Deploy (Vercel)
+- Projeto: `habitos-app` (conta `marcoscosta0920-3188s-projects`)
+- Alias prod: `https://habitos-app-alpha.vercel.app`
+- Push em `main` → deploy prod automático; push em `develop` → preview automático
 
 ## Padrão de Commits (Conventional Commits)
 - `feat:` nova feature
