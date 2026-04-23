@@ -37,7 +37,7 @@ export async function getPartnershipMembers(partnershipId: string) {
 
   const { data, error } = await supabase
     .from("partnership_members")
-    .select("user_id, role, joined_at, profiles!inner(display_name)")
+    .select("user_id, role, joined_at, profiles!inner(display_name, avatar_url)")
     .eq("partnership_id", partnershipId);
 
   if (error) throw error;
@@ -46,5 +46,6 @@ export async function getPartnershipMembers(partnershipId: string) {
     role: m.role,
     joined_at: m.joined_at,
     display_name: m.profiles.display_name,
+    avatar_url: m.profiles.avatar_url,
   }));
 }
