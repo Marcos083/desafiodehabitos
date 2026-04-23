@@ -51,4 +51,5 @@ export async function toggleCheckIn(habitId: string) {
   }
 
   revalidatePath("/hoje");
+  revalidatePath("/dashboard");
 }

@@ -3,6 +3,7 @@
 import {
   BarChart3,
   CalendarCheck,
+  LayoutDashboard,
   ListChecks,
   Users,
 } from "lucide-react";
@@ -12,6 +13,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/hoje", label: "Hoje", icon: CalendarCheck },
   { href: "/habitos", label: "Hábitos", icon: ListChecks },
   { href: "/parceiro", label: "Parceiro", icon: Users },
