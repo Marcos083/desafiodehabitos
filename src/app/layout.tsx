@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 
 import { Providers } from "@/app/providers";
@@ -14,6 +14,19 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Habit Partner",
   description: "Accountability de hábitos entre parceiros",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Habit Partner",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ff5300",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
