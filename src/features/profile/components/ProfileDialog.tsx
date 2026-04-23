@@ -1,9 +1,11 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
-import { Trash2, Upload, X } from "lucide-react";
+import { LogOut, Trash2, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
+
+import { signOut } from "@/features/auth/actions";
 
 import { Avatar } from "@/components/shared/Avatar";
 import { updateProfile } from "@/features/profile/actions";
@@ -250,6 +252,18 @@ export function ProfileDialog({
               </button>
             </div>
           </form>
+
+          <div className="mt-4 border-t border-border pt-4">
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="inline-flex w-full items-center gap-2 rounded-[12px] px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-bg hover:text-destructive"
+              >
+                <LogOut className="size-4" />
+                Sair da conta
+              </button>
+            </form>
+          </div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
