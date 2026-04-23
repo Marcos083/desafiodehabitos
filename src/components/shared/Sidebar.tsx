@@ -3,15 +3,18 @@
 import {
   BarChart3,
   CalendarCheck,
+  LayoutDashboard,
   ListChecks,
   Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { Avatar } from "@/components/shared/Avatar";
 import { cn } from "@/lib/utils";
 
 const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/hoje", label: "Hoje", icon: CalendarCheck },
   { href: "/habitos", label: "Hábitos", icon: ListChecks },
   { href: "/parceiro", label: "Parceiro", icon: Users },
@@ -21,12 +24,17 @@ const navItems = [
 type SidebarProps = {
   displayName: string;
   email: string;
+  avatarUrl: string | null;
   partnershipName?: string | null;
 };
 
-export function Sidebar({ displayName, email, partnershipName }: SidebarProps) {
+export function Sidebar({
+  displayName,
+  email,
+  avatarUrl,
+  partnershipName,
+}: SidebarProps) {
   const pathname = usePathname();
-  const initial = displayName.trim().charAt(0).toUpperCase() || "?";
 
   return (
     <aside className="hidden h-dvh w-64 shrink-0 flex-col border-r border-border bg-surface px-4 py-6 lg:flex">
@@ -76,9 +84,7 @@ export function Sidebar({ displayName, email, partnershipName }: SidebarProps) {
       </nav>
 
       <div className="mt-auto flex items-center gap-3 rounded-[14px] border border-border bg-bg px-3 py-2">
-        <div className="flex size-9 items-center justify-center rounded-full bg-signal-faint text-sm font-semibold text-ink">
-          {initial}
-        </div>
+        <Avatar name={displayName} url={avatarUrl} size="sm" />
         <div className="flex min-w-0 flex-col">
           <span className="truncate text-sm font-medium text-ink">
             {displayName}

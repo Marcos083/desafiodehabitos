@@ -1,15 +1,18 @@
-"use client";
-
 import { Bell, Moon, Search } from "lucide-react";
+
+import { TopbarAvatarButton } from "@/features/profile/components/TopbarAvatarButton";
 
 type TopbarProps = {
   displayName: string;
+  avatarUrl: string | null;
   notificationCount?: number;
 };
 
-export function Topbar({ displayName, notificationCount = 0 }: TopbarProps) {
-  const initial = displayName.trim().charAt(0).toUpperCase() || "?";
-
+export function Topbar({
+  displayName,
+  avatarUrl,
+  notificationCount = 0,
+}: TopbarProps) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-surface/80 px-4 backdrop-blur-md lg:px-6">
       <div className="flex flex-1 items-center justify-center">
@@ -45,9 +48,7 @@ export function Topbar({ displayName, notificationCount = 0 }: TopbarProps) {
           )}
         </button>
 
-        <div className="flex size-10 items-center justify-center rounded-full bg-signal-faint text-sm font-semibold text-ink">
-          {initial}
-        </div>
+        <TopbarAvatarButton displayName={displayName} avatarUrl={avatarUrl} />
       </div>
     </header>
   );
