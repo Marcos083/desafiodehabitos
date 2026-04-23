@@ -62,14 +62,14 @@ export default async function PlacarPage() {
       <div>
         <Link
           href="/hoje"
-          className="text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+          className="inline-flex items-center gap-1 rounded-sm text-sm text-muted-foreground transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
         >
-          ← Voltar
+          <span aria-hidden>←</span> Voltar
         </Link>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+        <h1 className="mt-1 text-3xl font-medium tracking-tight text-ink">
           Placar da semana
         </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           {start} a {end}
         </p>
       </div>
@@ -79,11 +79,36 @@ export default async function PlacarPage() {
         todayIndex={todayIndex === -1 ? null : todayIndex}
       />
 
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        Cada célula mostra <span className="font-medium">feitos/programados</span>{" "}
-        no dia. Verde = dia completo. Âmbar = parcial. &quot;–&quot; = sem
-        hábito programado.
-      </p>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+        <span className="font-medium text-ink">Legenda:</span>
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="inline-block size-3 rounded-full bg-signal"
+          />
+          Dia completo
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="inline-block size-3 rounded-full border border-signal/40 bg-signal-faint"
+          />
+          Parcial
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="inline-block size-3 rounded-full border border-border bg-bg"
+          />
+          Nenhum feito
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span aria-hidden className="text-base leading-none">
+            –
+          </span>
+          Sem hábito programado
+        </span>
+      </div>
     </main>
   );
 }
