@@ -17,15 +17,17 @@ export function TodayHabits({
   habits,
   checkIns,
   currentUserId,
+  date,
 }: {
   habits: Habit[];
   checkIns: CheckIn[];
   currentUserId: string;
+  date: string;
 }) {
   if (habits.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        Nenhum hábito seu programado pra hoje. Bom descanso!
+        Nenhum hábito seu programado pra esse dia. Bom descanso!
       </div>
     );
   }
@@ -45,7 +47,7 @@ export function TodayHabits({
             key={habit.id}
             className="flex items-center gap-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
           >
-            <CheckInButton habitId={habit.id} checked={checked} />
+            <CheckInButton habitId={habit.id} checked={checked} date={date} />
             <div className="flex-1">
               <p className="font-medium">{habit.name}</p>
               {habit.description && (

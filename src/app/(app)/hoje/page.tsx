@@ -2,29 +2,49 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { buttonVariants } from "@/components/ui/button";
-import { LogoutForm } from "@/features/auth/components/logout-form";
 import { CheckInsRealtime } from "@/features/check-ins/components/check-ins-realtime";
 import { TodayHabits } from "@/features/check-ins/components/today-habits";
-import { getTodayCheckIns } from "@/features/check-ins/queries";
+import { getCheckInsForDate } from "@/features/check-ins/queries";
 import { getHabits } from "@/features/habits/queries";
 import {
   getCurrentPartnership,
   getPartnershipMembers,
 } from "@/features/partnerships/queries";
-import { weekdayInBR } from "@/lib/date";
+import {
+  addDaysISO,
+  formatDateLabel,
+  todayInBR,
+  weekdayForDate,
+} from "@/lib/date";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function HojePage() {
+const MAX_DAYS_BACK = 7;
+
+export default async function HojePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const partnership = await getCurrentPartnership();
+  if (!partnership) redirect("/onboarding");
 
-  if (!partnership) {
-    redirect("/onboarding");
-  }
+  const today = todayInBR();
+  const minDate = addDaysISO(today, -MAX_DAYS_BACK);
+
+  const { date: rawDate } = await searchParams;
+  const date =
+    rawDate && rawDate <= today && rawDate >= minDate ? rawDate : today;
+
+  const isPast = date < today;
+  const canGoBack = date > minDate;
+  const canGoForward = date < today;
+  const prevDate = addDaysISO(date, -1);
+  const nextDate = addDaysISO(date, 1);
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -39,31 +59,62 @@ export default async function HojePage() {
   const partnerName = partner?.display_name ?? "aguardando parceiro";
   const isSolo = members.length < 2;
 
-  const today = weekdayInBR();
+  const weekday = weekdayForDate(date);
   const allHabits = await getHabits(partnership.id);
-  const checkIns = await getTodayCheckIns(partnership.id);
+  const checkIns = await getCheckInsForDate(partnership.id, date);
 
-  const activeToday = allHabits.filter((h) => h.active_days.includes(today));
-  const myHabitsToday = activeToday.filter((h) => h.user_id === user!.id);
-  const partnerHabitsToday = activeToday.filter(
-    (h) => h.user_id !== user!.id,
-  );
+  const activeOnDate = allHabits.filter((h) => h.active_days.includes(weekday));
+  const myHabitsOnDate = activeOnDate.filter((h) => h.user_id === user!.id);
+  const partnerHabitsOnDate = activeOnDate.filter((h) => h.user_id !== user!.id);
 
   const partnerCheckIns = partner
     ? checkIns.filter((c) => c.user_id === partner.user_id)
     : [];
   const partnerDone = partnerCheckIns.length;
-  const partnerTotal = partnerHabitsToday.length;
+  const partnerTotal = partnerHabitsOnDate.length;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
       <CheckInsRealtime partnershipId={partnership.id} />
+
       <header className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Olá, {displayName}</p>
-          <h1 className="text-3xl font-medium tracking-tight text-ink">Hoje</h1>
+          <h1 className="text-3xl font-medium tracking-tight text-ink">
+            {formatDateLabel(date, today)}
+          </h1>
         </div>
-        <LogoutForm />
+
+        <nav className="flex items-center gap-1" aria-label="Navegar entre dias">
+          <Link
+            href={canGoBack ? `/hoje?date=${prevDate}` : "#"}
+            aria-disabled={!canGoBack}
+            className={buttonVariants({
+              variant: "outline",
+              size: "sm",
+            }) + (!canGoBack ? " pointer-events-none opacity-40" : "")}
+          >
+            ←
+          </Link>
+          {isPast && (
+            <Link
+              href="/hoje"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Hoje
+            </Link>
+          )}
+          <Link
+            href={canGoForward ? `/hoje?date=${nextDate}` : "#"}
+            aria-disabled={!canGoForward}
+            className={buttonVariants({
+              variant: "outline",
+              size: "sm",
+            }) + (!canGoForward ? " pointer-events-none opacity-40" : "")}
+          >
+            →
+          </Link>
+        </nav>
       </header>
 
       {isSolo && (
@@ -91,7 +142,7 @@ export default async function HojePage() {
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-medium tracking-tight text-ink">
-            Seus hábitos hoje
+            {isPast ? "Seus hábitos nesse dia" : "Seus hábitos hoje"}
           </h2>
           <div className="flex gap-2">
             <Link
@@ -109,9 +160,10 @@ export default async function HojePage() {
           </div>
         </div>
         <TodayHabits
-          habits={myHabitsToday}
+          habits={myHabitsOnDate}
           checkIns={checkIns}
           currentUserId={user!.id}
+          date={date}
         />
       </section>
 
@@ -121,7 +173,9 @@ export default async function HojePage() {
             {partnerName}
           </h2>
           <div className="rounded-[20px] border border-border bg-surface p-5">
-            <p className="text-sm text-muted-foreground">Progresso hoje</p>
+            <p className="text-sm text-muted-foreground">
+              {isPast ? "Progresso nesse dia" : "Progresso hoje"}
+            </p>
             <p className="mt-1 text-3xl font-medium tabular-nums text-ink">
               {partnerDone}
               <span className="text-muted-foreground/60">
@@ -131,7 +185,7 @@ export default async function HojePage() {
             </p>
             {partnerTotal === 0 && (
               <p className="mt-2 text-xs text-muted-foreground">
-                Seu parceiro não tem hábitos programados pra hoje.
+                Seu parceiro não tinha hábitos programados pra esse dia.
               </p>
             )}
           </div>

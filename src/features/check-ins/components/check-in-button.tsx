@@ -8,9 +8,11 @@ import { cn } from "@/lib/utils";
 export function CheckInButton({
   habitId,
   checked,
+  date,
 }: {
   habitId: string;
   checked: boolean;
+  date: string;
 }) {
   const [pending, startTransition] = useTransition();
 
@@ -19,7 +21,7 @@ export function CheckInButton({
       type="button"
       disabled={pending}
       aria-pressed={checked}
-      onClick={() => startTransition(() => toggleCheckIn(habitId))}
+      onClick={() => startTransition(() => toggleCheckIn(habitId, date))}
       className={cn(
         "flex size-12 shrink-0 items-center justify-center rounded-full border-2 transition-all",
         checked

@@ -26,6 +26,23 @@ export function weekdayInBR(): number {
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 }
 
+export function weekdayForDate(iso: string): number {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y!, m! - 1, d!)).getUTCDay();
+}
+
+export function formatDateLabel(iso: string, todayISO: string): string {
+  if (iso === todayISO) return "Hoje";
+  if (iso === addDaysISO(todayISO, -1)) return "Ontem";
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y!, m! - 1, d!)).toLocaleDateString("pt-BR", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+}
+
 export function addDaysISO(iso: string, delta: number): string {
   const [y, m, d] = iso.split("-").map(Number);
   const dt = new Date(Date.UTC(y!, m! - 1, d! + delta));
